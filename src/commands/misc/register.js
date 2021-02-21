@@ -35,17 +35,17 @@ export default class Register extends Command {
     }
 
     // register player
-    if(!sqlHandler.findPlayer(msg.author.id)) {
-      sqlHandler.savePlayer(msg.author.id, args[0]);
-      
-      //send register message
-      messageHandler.sendRichTextDefault({
-        guild: msg.guild,
-        channel: msg.channel,
-        title: language.commands.register.labels.title,
-        description: replaceArgs(language.commands.register.description, [args[0]])
-      });
+    if(!await sqlHandler.findPlayer(msg.author.id)) {
+      await sqlHandler.savePlayer(msg.author.id, args[0]);
+    } else {
+      await sqlHandler.editPlayer(msg.author.id, args[0]);
     }
+    messageHandler.sendRichTextDefault({
+      guild: msg.guild,
+      channel: msg.channel,
+      title: language.commands.register.labels.title,
+      description: replaceArgs(language.commands.register.labels.description, [msg.author.name, args[0]])
+    });
 
   }
 }

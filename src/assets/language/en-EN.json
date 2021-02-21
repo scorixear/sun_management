@@ -1,7 +1,11 @@
 {
   "commands": {
     "register": {
-
+      "description": "Registers your Albion Character with this discord.",
+      "labels": {
+        "title": "Successfull registered $0",
+        "description": "Successfull registered $0 with the account $1."
+      }
     },
     "help": {
       "description": "Returns a list of commands, you are able to use or informations about a specific command!",

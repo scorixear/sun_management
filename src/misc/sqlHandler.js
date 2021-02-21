@@ -60,6 +60,18 @@ async function savePlayer(key, value) {
   }
 }
 
+async function editPlayer(key, value) {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    await conn.query(`UPDATE \`SUN_Members\` SET \`value\`=${pool.escape(value)} WHERE \`key\` = ${pool.escape(key)}`);
+  } catch (err) {
+    throw err;
+  } finally {
+    if (conn) return conn.end();
+  }
+}
+
 export default {
   initDB,
   findPlayer,
