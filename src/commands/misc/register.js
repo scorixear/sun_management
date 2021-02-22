@@ -34,18 +34,28 @@ export default class Register extends Command {
       return;
     }
 
+    let returnValue = true;
     // register player
     if(!await sqlHandler.findPlayer(msg.author.id)) {
-      await sqlHandler.savePlayer(msg.author.id, args[0]);
+      returnValue = await sqlHandler.savePlayer(msg.author.id, args[0]);
     } else {
-      await sqlHandler.editPlayer(msg.author.id, args[0]);
+      returnValue = await sqlHandler.editPlayer(msg.author.id, args[0]);
     }
-    messageHandler.sendRichTextDefault({
-      guild: msg.guild,
-      channel: msg.channel,
-      title: language.commands.register.labels.title,
-      description: replaceArgs(language.commands.register.labels.description, [msg.author.name, args[0]])
-    });
+    if(returnValue) {
+      messageHandler.sendRichTextDefault({
+        msg: msg,
+        title: replaceArgs(language.commands.register.labels.title, [msg.guild.member(msg.author).displayName]),
+        description: replaceArgs(language.commands.register.labels.description, [msg.guild.member(msg.author), args[0]])
+      });
+    } else {
+      messageHandler.sendRichTextDefault({
+        msg: msg,
+        title: language.commands.register.error.title,
+        description: replaceArgs(language.commands.register.error.description, [args[0]]),
+        color: 0xcc0000,
+      });
+    }
+   
 
   }
 }

@@ -93,7 +93,8 @@ function sendRichTextExplicit(guild, channel, author, title, categories, color, 
   if (footer) {
     richText.setFooter(footer);
   } else if (guild && author) {
-    richText.setFooter(guild.member(author).nickname, author.avatarURL());
+    //console.log(guild.member(author));
+    richText.setFooter(guild.member(author).displayName, author.avatarURL());
     richText.setTimestamp(new Date());
   }
 

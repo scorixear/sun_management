@@ -1,7 +1,7 @@
 {
   "token": "your_token",
   "discordUrl": "https://discordapp.com/oauth2/authorize?client_id=client_id&scope=bot&permissions=2146958807",
-  "repository": "https://github.com/scorixear/n1ghtmare_bot",
+  "repository": "https://github.com/scorixear/sun_management",
   "botPrefix": "!",
   "trackedGuilds": ["N1GHTMARE"],
   "language": "en-EN",
@@ -9,5 +9,5 @@
   "dbuser": "username",
   "dbpassword": "password",
   "dbport": "3306",
-  "dbDataBase": "sunManagement"
+  "dbDataBase": "sunmanagement"
 }

@@ -38,8 +38,8 @@ function parseCommand(msg) {
   let params;
   // if does not start with prefix, return;
   if (msg.content[0] !== config.botPrefix) return;
-  else if (msg.channel.name !== config.botChannel) return;
-  else if (msg.guild.name !== config.botGuild) return;
+  // else if (msg.channel.name !== config.botChannel) return;
+  // else if (msg.guild.name !== config.botGuild) return;
   else {
     const temp = parseCommandParams(msg);
     if (!temp) return;

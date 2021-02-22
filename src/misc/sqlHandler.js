@@ -50,21 +50,47 @@ async function findPlayer(key) {
 
 async function savePlayer(key, value) {
   let conn;
+  let returnValue = true;
   try {
     conn = await pool.getConnection();
+    const rows = await conn.query(`SELECT \`key\` FROM \`SUN_Members\` WHERE \`value\` = ${pool.escape(value)} AND \`key\` != ${pool.escape(key)}`);
+    if(rows && rows[0]) {
+      returnValue = false;
+    } else {
     await conn.query(`INSERT INTO \`SUN_Members\` VALUES (${pool.escape(key)}, ${pool.escape(value)})`);
+    }
   } catch (err) {
     throw err;
   } finally {
-    if (conn) return conn.end();
+    if (conn) conn.end();
+    return returnValue;
   }
 }
 
 async function editPlayer(key, value) {
   let conn;
+  let returnValue = true;
   try {
     conn = await pool.getConnection();
-    await conn.query(`UPDATE \`SUN_Members\` SET \`value\`=${pool.escape(value)} WHERE \`key\` = ${pool.escape(key)}`);
+    const rows = await conn.query(`SELECT \`key\` FROM \`SUN_Members\` WHERE \`value\` = ${pool.escape(value)} AND \`key\` != ${pool.escape(key)}`);
+    if(rows && rows[0]) {
+      returnValue = false;
+    } else {
+      await conn.query(`UPDATE \`SUN_Members\` SET \`value\`=${pool.escape(value)} WHERE \`key\` = ${pool.escape(key)}`);
+    }
+  } catch (err) {
+    throw err;
+  } finally {
+    if (conn) conn.end();
+    return returnValue;
+  }
+}
+
+async function removePlayer(key) {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    await conn.query(`DELETE FROM \`SUN_Members\` WHERE \`key\` = ${pool.escape(key)}`);
   } catch (err) {
     throw err;
   } finally {
@@ -76,4 +102,6 @@ export default {
   initDB,
   findPlayer,
   savePlayer,
+  editPlayer,
+  removePlayer,
 };
