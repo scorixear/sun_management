@@ -34,6 +34,10 @@ export default class Register extends Command {
       return;
     }
 
+    if(args[0] === config.ignoreRole) {
+      return;
+    }
+
     let returnValue = true;
     // register player
     if(!await sqlHandler.findPlayer(msg.author.id)) {

@@ -53,6 +53,13 @@ export default class ForceSet extends Command {
     if(!user) {
       return;
     }
+    if(args[1] !== config.ignoreRole) {
+      const previousOwner = await sqlHandler.findIngameName(args[1]);
+      if(previousOwner) {
+        await sqlHandler.removePlayer(previousOwner);
+      }
+    }
+    
 
     // register player
     if(!await sqlHandler.findPlayer(user.id)) {

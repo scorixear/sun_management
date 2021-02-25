@@ -54,7 +54,7 @@ async function savePlayer(key, value) {
   try {
     conn = await pool.getConnection();
     const rows = await conn.query(`SELECT \`key\` FROM \`SUN_Members\` WHERE \`value\` = ${pool.escape(value)} AND \`key\` != ${pool.escape(key)}`);
-    if(rows && rows[0]) {
+    if(rows && rows[0] && value !== config.ignoreRole) {
       returnValue = false;
     } else {
     await conn.query(`INSERT INTO \`SUN_Members\` VALUES (${pool.escape(key)}, ${pool.escape(value)})`);
@@ -73,7 +73,7 @@ async function editPlayer(key, value) {
   try {
     conn = await pool.getConnection();
     const rows = await conn.query(`SELECT \`key\` FROM \`SUN_Members\` WHERE \`value\` = ${pool.escape(value)} AND \`key\` != ${pool.escape(key)}`);
-    if(rows && rows[0]) {
+    if(rows && rows[0] && value !== config.ignoreRole) {
       returnValue = false;
     } else {
       await conn.query(`UPDATE \`SUN_Members\` SET \`value\`=${pool.escape(value)} WHERE \`key\` = ${pool.escape(key)}`);
@@ -84,6 +84,23 @@ async function editPlayer(key, value) {
     if (conn) conn.end();
     return returnValue;
   }
+}
+
+async function findIngameName(value) {
+  let conn;
+  let returnValue = undefined;
+  try {
+    conn = await pool.getConnection();
+    const rows = await conn.query(`SELECT \`key\` FROM \`SUN_Members\` WHERE \`value\` = ${pool.escape(value)}`);
+    if(rows && rows[0]) {
+      returnValue = rows[0].key;
+    }
+  } catch (err) {
+    throw err;
+  } finally {
+    if (conn) conn.end();
+  }
+  return returnValue;
 }
 
 async function removePlayer(key) {
@@ -103,5 +120,6 @@ export default {
   findPlayer,
   savePlayer,
   editPlayer,
+  findIngameName,
   removePlayer,
 };

@@ -1,4 +1,5 @@
 import Discord from 'discord.js';
+import config from '../config';
 import sqlHandler from '../misc/sqlHandler';
 
 const client = new Discord.Client();
@@ -12,8 +13,8 @@ async function removePlayers(guild, albionMembers) {
   for(const guildMember of guildMembers) {
     if(!guildMember[1].user.bot) {
       const albionName = await sqlHandler.findPlayer(guildMember[1].id);
-      if(!albionName || !albionMembers.includes(albionName)) {
-        if(guildMember[1].roles.cache.filter(role => role.name !== "@everyone").size > 0) {
+      if((!albionName || !albionMembers.includes(albionName))) {
+        if(albionName !== config.ignoreRole && guildMember[1].roles.cache.filter(role => role.name !== "@everyone").size > 0) {
           guildMember[1].roles.set([]);
           players.push(guildMember[1]);
         }

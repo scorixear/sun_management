@@ -7,6 +7,7 @@
   "language": "en-EN",
   "registerChannel": "register-channel",
   "removeChannel": "remove-channel",
+  "ignoreRole": "sun_management_ignore",
   "dbhost": "127.0.0.1",
   "dbuser": "username",
   "dbpassword": "password",
