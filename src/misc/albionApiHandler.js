@@ -1,21 +1,26 @@
+// import packages
 import request from 'request';
 import config from '../config';
-import sqlHandler from './sqlHandler';
 import discordHandler from './discordHandler';
 import messageHandler from './messageHandler';
 import {dic as language, replaceArgs} from './languageHandler.js';
-import { restart } from 'nodemon';
 const baseUri = 'https://gameinfo.albiononline.com/api/gameinfo/';
 const guildSearch = 'search?q=';
 let guildIds = [];
 let guildMembers = [];
 
+/**
+ * Clears Roles from Members not in the albion guilds
+ */
 async function clearAlbionMembers() {
   guildMembers = [];
+  // if guildIds are not cache, retrieve them
   if(guildIds.length < 1) {
     await searchGuildIds();
   }
+  // for each guild id
   for(const guildId of guildIds) {
+    // retrieve the members list
     try {
       const body = await doRequest(`${baseUri}guilds/${guildId}/members`);
       addGuildMembers(body);
@@ -23,7 +28,9 @@ async function clearAlbionMembers() {
       return;
     }
   }
+  // remove the roles
   let removedPlayers = await removeRoles();
+  // print the Players which get removed in each guild this bot is registered with
   for(const guild of discordHandler.client.guilds.cache) {
     const channel = guild[1].channels.cache.find(channel=>channel.name === config.removeChannel);
     messageHandler.sendRichTextDefaultExplicit({
@@ -36,22 +43,30 @@ async function clearAlbionMembers() {
  
   return removedPlayers;
 }
-
+/**
+ * Adds a guild member name to the list
+ * @param {*} body 
+ */
 function addGuildMembers(body) {
   for(const playerInfo of body) {
     guildMembers.push(playerInfo.Name);
   }
 }
 
+/**
+ * Removes the roles from the players
+ */
 async function removeRoles() {
-
   let removedPlayers = []
   for(const guild of discordHandler.client.guilds.cache) {
-    removedPlayers.push(await discordHandler.removePlayers(guild[1], guildMembers));
+    removedPlayers.push(await discordHandler.removeRolesFromPlayers(guild[1], guildMembers));
   }
   return removedPlayers;
 }
 
+/**
+ * searches Guild Ids
+ */
 async function searchGuildIds() {
   for(const guildName of config.trackedGuilds) {
     try {
@@ -68,7 +83,7 @@ async function searchGuildIds() {
 }
 
 /**
- * 
+ * Converts the request into a promise to use awaits.
  * @param {String} url
  * @return {Promise<*>} 
  */

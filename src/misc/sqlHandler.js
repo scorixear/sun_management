@@ -1,9 +1,11 @@
+// import packages
 /* eslint-disable max-len */
 import mariadb from 'mariadb';
 import config from './../config.js';
 // eslint-disable-next-line no-unused-vars
 import Discord from 'discord.js';
 
+// initialize the connection pool
 const pool = mariadb.createPool({
   host: config.dbhost,
   user: config.dbuser,
@@ -23,6 +25,7 @@ async function initDB() {
     console.log('Start DB Connection');
     conn = await pool.getConnection();
     console.log('DB Connection established');
+    // create Table for SUN Members
     await conn.query('CREATE TABLE IF NOT EXISTS `SUN_Members` (`key` VARCHAR(255), `value` VARCHAR(255), PRIMARY KEY (`key`))');
   } catch (err) {
     throw err;
@@ -31,6 +34,11 @@ async function initDB() {
   }
 }
 
+/**
+ * Finds an ingame name in the SUN_Members table
+ * @param {string} key 
+ * @return {string}
+ */
 async function findPlayer(key) {
   let conn;
   let returnValue = undefined;
@@ -48,6 +56,13 @@ async function findPlayer(key) {
   return returnValue;
 }
 
+/**
+ * Saves a new player with their ingame name in SUN_Management table.
+ * Returns true if the save was successfull (player was not already in the database)
+ * @param {string} key 
+ * @param {string} value 
+ * @return {boolean}
+ */
 async function savePlayer(key, value) {
   let conn;
   let returnValue = true;
@@ -67,6 +82,13 @@ async function savePlayer(key, value) {
   }
 }
 
+/**
+ * Edits the current player ingame name.
+ * Returns true if edit was successfull (ingame name does not already exist) 
+ * @param {string} key 
+ * @param {string} value
+ * @return {boolean} 
+ */
 async function editPlayer(key, value) {
   let conn;
   let returnValue = true;
@@ -86,7 +108,12 @@ async function editPlayer(key, value) {
   }
 }
 
-async function findIngameName(value) {
+/**
+ * Finds a discord is given a ingame name
+ * @param {string} value 
+ * @return {string}
+ */
+async function findPlayerFromIngameName(value) {
   let conn;
   let returnValue = undefined;
   try {
@@ -103,6 +130,10 @@ async function findIngameName(value) {
   return returnValue;
 }
 
+/**
+ * Removes an entry from the database
+ * @param {string} key 
+ */
 async function removePlayer(key) {
   let conn;
   try {
@@ -120,6 +151,6 @@ export default {
   findPlayer,
   savePlayer,
   editPlayer,
-  findIngameName,
+  findPlayerFromIngameName,
   removePlayer,
 };

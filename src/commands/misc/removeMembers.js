@@ -13,7 +13,7 @@ export default class RemoveMembers extends Command {
     this.command = 'removeMembers';
     this.description = () => language.commands.removeMembers.description;
     this.example = 'removeMembers';
-    this.permissions = ["MANAGE_CHANNELS"]
+    this.permissions = ["MANAGE_ROLES"]
   }
   /**
    * Executes the command
@@ -22,11 +22,13 @@ export default class RemoveMembers extends Command {
    * @param {*} params added parameters and their argument
    */
   async executeCommand(args, msg, params) {
+    // check permissions
     try {
       super.executeCommand(args, msg, params);
     } catch (err) {
       return;
     }
+    // starts removing players
     messageHandler.sendRichTextDefault({
       msg: msg,
       title: language.commands.removeMembers.labels.titleRemoving,

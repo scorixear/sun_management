@@ -28,7 +28,7 @@ commandFiles.forEach((folder) => {
 });
 
 /**
- * parses the Command
+ * Parses the Command
  * @param {Message} msg
  */
 function parseCommand(msg) {
@@ -41,26 +41,34 @@ function parseCommand(msg) {
   // else if (msg.channel.name !== config.botChannel) return;
   // else if (msg.guild.name !== config.botGuild) return;
   else {
+    // parses Command Parameters
     const temp = parseCommandParams(msg);
     if (!temp) return;
     command = temp.command;
     args = temp.args;
     params = temp.params;
-    module = commands.find((c) => c.command.toLowerCase() == command.toLowerCase());
+    // find class that represents the given command
+    module = commands.find((c) => c.command.toLowerCase() === command.toLowerCase());
   }
+  // if no command was found
   if (!module || !module.executeCommand) {
+    
     const commandOptions = commands.map((c)=>c.command);
     const message = replaceArgs(language.handlers.command.error.unknown, [config.botPrefix]);
+    // calculate levenshteinDistance to the closest command
     const possible = levenshteinDistance.findClosestMatch(command.toLowerCase(), commandOptions);
+    // resolve it with reactions
     emojiHandler.resolveWithReaction(msg, message, possible, msg.content.substring(command.length + 1), (c, m, a)=> {
       module = commands.find((x)=> x.command.toLowerCase() == c.toLowerCase());
       module.executeCommand(a[0], m, a[1]);
     }, [args, params]);
     return;
   }
+  // otherwise execute command
   try {
     module.executeCommand(args, msg, params);
   } catch (err) {
+    // if any error occured during executing print a message
     console.log(err);
     msgHandler.sendRichText(msg, language.general.error, [{
       title: language.general.message,

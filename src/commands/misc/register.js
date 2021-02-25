@@ -22,51 +22,66 @@ export default class Register extends Command {
    * @param {*} params added parameters and their argument
    */
   async executeCommand(args, msg, params) {
+    // checks permissions
     try {
       super.executeCommand(args, msg, params);
     } catch (err) {
       return;
     }
+
+    // if there is only the player name given
     if(args.length == 1) {
+      // retrieve user object from mention
       let user = this.getUserFromMention(args[0]);
       if(!user) {
         return;
       }
+      // removes ingame entry
       await sqlHandler.removePlayer(user.id);
       messageHandler.sendRichTextDefault({
         msg: msg,
         title: replaceArgs(language.commands.register.labels.removeTitle, [msg.guild.member(user).displayName]),
         description: replaceArgs(language.commands.register.labels.removeDescription, [msg.guild.member(user), args[1]])
       });
+      return;
     }
     
+    // if args are less then two this execution ends here
     if(args.length < 2) {
       return;
     }
 
+    // if channel name is not the register channel
     if(msg.channel.name != config.registerChannel) {
       return;
     }
 
+    // retrieve User object from mention
     let returnValue = true;
     let user = this.getUserFromMention(args[0]);
     if(!user) {
       return;
     }
+    // if given role is not the ignore role
     if(args[1] !== config.ignoreRole) {
-      const previousOwner = await sqlHandler.findIngameName(args[1]);
+      // check if there is already a player registered with this ingame name
+      const previousOwner = await sqlHandler.findPlayerFromIngameName(args[1]);
+      // if yes remove the previous entry
       if(previousOwner) {
         await sqlHandler.removePlayer(previousOwner);
       }
     }
     
 
-    // register player
+    // if player is not already entered
     if(!await sqlHandler.findPlayer(user.id)) {
+      // save entry
       returnValue = await sqlHandler.savePlayer(user.id, args[1]);
     } else {
+      // edit entry
       returnValue = await sqlHandler.editPlayer(user.id, args[1]);
     }
+    // if save was successfull
     if(returnValue) {
       messageHandler.sendRichTextDefault({
         msg: msg,
@@ -78,6 +93,10 @@ export default class Register extends Command {
 
   }
 
+  /**
+   * Retrieves user from mention
+   * @param {string} mention 
+   */
   getUserFromMention(mention) {
     if (!mention) return;
   

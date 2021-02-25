@@ -25,9 +25,13 @@ export default class Help extends Command {
     } catch (err) {
       return;
     }
+    // if help command is about another command
     if (args && args.length > 0) {
+      // find specified command
       const command = cmdHandler.commands.find((v) => v.command == args[0]);
       if (command) {
+        // if player has not the permission
+        // print fake message that the command does not exist
         if (permHandler.checkPermissionSilent(command.permissions, msg) === false) {
           msgHandler.sendRichText(msg, 'Help Info', [{
             title: 'Info',
@@ -35,6 +39,7 @@ export default class Help extends Command {
           }]);
           return;
         }
+        // parse command variables
         const example = '\`\`\`' + config.botPrefix +
             command.example
                 .split('\n')
@@ -62,6 +67,7 @@ export default class Help extends Command {
           ],
         });
       } else {
+        // print unkown command message
         msgHandler.sendRichText(msg, 'Help Info', [{
           title: 'Info',
           text: replaceArgs(language.commands.help.error.unknown, [config.botPrefix]),
@@ -70,6 +76,8 @@ export default class Help extends Command {
       return;
     }
 
+    // gather all commands that this persion has permissions to
+    // and order them by their folder structure
     const categories = new Map();
     cmdHandler.commands.forEach((cmd) => {
       if (permHandler.checkPermissionSilent(cmd.permissions, msg)) {
@@ -80,6 +88,7 @@ export default class Help extends Command {
         }
       }
     });
+    // create embedded categories for embedded message
     const embededCategories = new Array({
       title: 'Info',
       text: replaceArgs(language.commands.help.success.type, [config.botPrefix, language.commands.help.labels.command]),
@@ -93,6 +102,7 @@ export default class Help extends Command {
         inline: true,
       });
     });
+    // send message
     msgHandler.sendRichText(msg, 'Help Info', embededCategories, 0x616161);
   }
 }
