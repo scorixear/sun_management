@@ -36,7 +36,9 @@
       "description": "Removes unregistered players and are not in the guild.",
       "labels": {
         "title": "Removed Players",
-        "description": "The following players were removed:\n$0"
+        "description": "The following players were removed:\n$0",
+        "titleRemoving": "Removing Players",
+        "descriptionRemoving": "This will take a while. Waiting for Albion API Response..."
       }
     }
   },

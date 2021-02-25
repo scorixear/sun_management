@@ -27,13 +27,13 @@ export default class RemoveMembers extends Command {
     } catch (err) {
       return;
     }
-    
-    const removedPlayers = await albionApiHandler.clearAlbionMembers();
     messageHandler.sendRichTextDefault({
       msg: msg,
-      title: replaceArgs(language.commands.removeMembers.labels.title, [removedPlayers.length]),
-      description: replaceArgs(language.commands.removeMembers.labels.description, [removedPlayers.join('\n')]),
+      title: language.commands.removeMembers.labels.titleRemoving,
+      description: language.commands.removeMembers.labels.descriptionRemoving,
     });
+    const removedPlayers = await albionApiHandler.clearAlbionMembers();
+    
 
   }
 }

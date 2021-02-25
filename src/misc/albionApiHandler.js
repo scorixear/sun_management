@@ -19,7 +19,18 @@ async function clearAlbionMembers() {
     const body = await doRequest(`${baseUri}guilds/${guildId}/members`);
     addGuildMembers(body);
   }
-  return await removeRoles();
+  let removedPlayers = await removeRoles();
+  for(const guild of discordHandler.client.guilds.cache) {
+    const channel = guild[1].channels.cache.find(channel=>channel.name === config.removeChannel);
+    messageHandler.sendRichTextDefaultExplicit({
+      guild: guild,
+      channel: channel,
+      title: replaceArgs(language.commands.removeMembers.labels.title, [removedPlayers.length]),
+      description: replaceArgs(language.commands.removeMembers.labels.description, [removedPlayers.join('\n')]),
+    });
+  }
+ 
+  return removedPlayers;
  
 }
 
