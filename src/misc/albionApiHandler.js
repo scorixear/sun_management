@@ -16,8 +16,12 @@ async function clearAlbionMembers() {
     await searchGuildIds();
   }
   for(const guildId of guildIds) {
-    const body = await doRequest(`${baseUri}guilds/${guildId}/members`);
-    addGuildMembers(body);
+    try {
+      const body = await doRequest(`${baseUri}guilds/${guildId}/members`);
+      addGuildMembers(body);
+    } catch {
+      return;
+    }
   }
   let removedPlayers = await removeRoles();
   for(const guild of discordHandler.client.guilds.cache) {
@@ -31,7 +35,6 @@ async function clearAlbionMembers() {
   }
  
   return removedPlayers;
- 
 }
 
 function addGuildMembers(body) {
@@ -51,14 +54,17 @@ async function removeRoles() {
 
 async function searchGuildIds() {
   for(const guildName of config.trackedGuilds) {
-    const body = await doRequest(`${baseUri}${guildSearch}${guildName}`);
-    for(const guildInfo of body.guilds) {
-      if(config.trackedGuilds.includes(guildInfo.Name)) {
-        guildIds.push(guildInfo.Id);
+    try {
+      const body = await doRequest(`${baseUri}${guildSearch}${guildName}`);
+      for(const guildInfo of body.guilds) {
+        if(config.trackedGuilds.includes(guildInfo.Name)) {
+          guildIds.push(guildInfo.Id);
+        }
       }
+    } catch {
+      return;
     }
   }
-  
 }
 
 /**

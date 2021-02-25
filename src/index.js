@@ -7,9 +7,9 @@ import SqlHandler from './misc/sqlHandler.js';
 DiscordHandler.client.on('ready', () => {
   console.log('SUN Management Bot online!');
   DiscordHandler.client.user.setActivity('🦆Quack');
-  /*setInterval(()=> {
+  setInterval(()=> {
     albionApiHandler.clearAlbionMembers();
-  }, 24*60*60*1000);*/
+  }, 24*60*60*1000);
 })
 
 DiscordHandler.client.on('message', CmdHandler? CmdHandler.parseCommand: () => {});
