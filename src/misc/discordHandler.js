@@ -15,10 +15,12 @@ async function removePlayers(guild, albionMembers) {
       const albionName = await sqlHandler.findPlayer(guildMember[1].id);
       if((!albionName || !albionMembers.includes(albionName))) {
         if(albionName !== config.ignoreRole && guildMember[1].roles.cache.filter(role => role.name !== "@everyone").size > 0) {
-          guildMember[1].roles.set([]);
-          players.push(guildMember[1]);
+          if(!guild.roles.cache.find(role => config.saveRoles.includes(role.name)))
+          {
+            guildMember[1].roles.set([]);
+            players.push(guildMember[1]);
+          }
         }
-        
       }
     }
   }

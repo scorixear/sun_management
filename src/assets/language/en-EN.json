@@ -1,17 +1,6 @@
 {
   "commands": {
     "register": {
-      "description": "Registers your Albion Character with this discord.",
-      "labels": {
-        "title": "Successfully registered $0",
-        "description": "Successfully registered $0 with the account `$1`."
-      },
-      "error": {
-        "title": "Error with Registration",
-        "description": "There was already a player registered with the ingame name `$0`"
-      }
-    },
-    "forceSet": {
       "description": "Registers an Albion Character with a user on this discord.",
       "labels": {
         "title": "Successfully registered $0",

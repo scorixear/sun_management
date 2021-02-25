@@ -4,6 +4,7 @@
   "repository": "https://github.com/scorixear/sun_management",
   "botPrefix": "!",
   "trackedGuilds": ["SUN", "SUN-Alts"],
+  "saveRoles": ["Albion Officer", "Captains", "Quartermaster", "Sun Council", "Recruiter"],
   "language": "en-EN",
   "registerChannel": "register-channel",
   "removeChannel": "remove-channel",
