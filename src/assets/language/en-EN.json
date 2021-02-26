@@ -12,13 +12,13 @@
     "help": {
       "description": "Returns a list of commands, you are able to use or informations about a specific command!",
       "error": {
-        "unknown":"This command is unknown.\nUse `$0help` for a list of commands."
+        "unknown": "This command is unknown.\nUse `$0help` for a list of commands."
       },
       "labels": {
         "command": "Command"
       },
-      "success":{
-        "type":"Type in `$0<$1> [args]` to use a $1!"
+      "success": {
+        "type": "Type in `$0<$1> [args]` to use a $1!"
       }
     },
     "removeMembers": {
@@ -61,12 +61,12 @@
     "server": "Server",
     "user": "User",
     "message": "Message",
-    "title" :"Title"
+    "title": "Title"
   },
   "error": {
     "user_mention": "You must mention a user",
     "user_not_found": "User not found",
     "invalid_permissions": "Invalid permissions",
-    "invalid_usage" : "Invalid usage"
+    "invalid_usage": "Invalid usage"
   }
 }

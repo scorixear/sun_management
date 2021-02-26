@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import Discord from 'discord.js';
+import Discord from 'discord.js'
 
 /**
  * Prints a MessageEmbed
@@ -15,9 +15,19 @@ function sendRichTextDefault({
   description,
   thumbnail,
   url,
-  footer,
+  footer
 }) {
-  return sendRichText(msg, title, categories, color, image, description, thumbnail, url, footer);
+  return sendRichText(
+    msg,
+    title,
+    categories,
+    color,
+    image,
+    description,
+    thumbnail,
+    url,
+    footer
+  )
 }
 
 /**
@@ -36,9 +46,21 @@ function sendRichTextDefaultExplicit({
   description,
   thumbnail,
   url,
-  footer,
+  footer
 }) {
-  return sendRichTextExplicit(guild, channel, author, title, categories, color, image, description, thumbnail, url, footer);
+  return sendRichTextExplicit(
+    guild,
+    channel,
+    author,
+    title,
+    categories,
+    color,
+    image,
+    description,
+    thumbnail,
+    url,
+    footer
+  )
 }
 
 /**
@@ -56,52 +78,68 @@ function sendRichTextDefaultExplicit({
  * @param {string} footer
  * @return {Promise<(Discord.Message|Array<Discord.Message>)>}
  */
-function sendRichTextExplicit(guild, channel, author, title, categories, color, image, description, thumbnail, url, footer) {
-  const richText = new Discord.MessageEmbed();
+function sendRichTextExplicit(
+  guild,
+  channel,
+  author,
+  title,
+  categories,
+  color,
+  image,
+  description,
+  thumbnail,
+  url,
+  footer
+) {
+  const richText = new Discord.MessageEmbed()
   if (title) {
-    richText.setTitle(title);
+    richText.setTitle(title)
   }
 
   if (categories) {
     categories.forEach((category) => {
       if (category.title) {
-        richText.addField(category.title, category.text || '', category.inline || false);
+        richText.addField(
+          category.title,
+          category.text || '',
+          category.inline || false
+        )
       } else {
-        richText.addField('\u200b', '\u200b', category.inline || false);
+        richText.addField('\u200b', '\u200b', category.inline || false)
       }
-    });
+    })
   }
   if (color) {
-    richText.setColor(color);
+    richText.setColor(color)
   }
   if (description) {
-    richText.setDescription(description);
+    richText.setDescription(description)
   }
   if (thumbnail) {
     if (thumbnail.startsWith('http')) {
-      richText.setThumbnail(thumbnail);
+      richText.setThumbnail(thumbnail)
     } else {
-      richText.attachFiles([`./src/assets/${thumbnail}`]);
-      richText.setThumbnail(`attachment://${thumbnail}`);
+      richText.attachFiles([`./src/assets/${thumbnail}`])
+      richText.setThumbnail(`attachment://${thumbnail}`)
     }
   }
   if (image) {
-    richText.attachFiles([`./src/assets/${image}`]);
-    richText.setImage(`attachment://${image}`);
+    richText.attachFiles([`./src/assets/${image}`])
+    richText.setImage(`attachment://${image}`)
   }
 
   if (footer) {
-    richText.setFooter(footer);
+    richText.setFooter(footer)
   } else if (guild && author) {
-    richText.setFooter(guild.member(author).displayName, author.avatarURL());
-    richText.setTimestamp(new Date());
+    richText.setFooter(guild.member(author).displayName, author.avatarURL())
+    richText.setTimestamp(new Date())
   }
 
   if (url) {
-    richText.setURL(url);
+    richText.setURL(url)
   }
 
-  return channel.send(richText);
+  return channel.send(richText)
 }
 
 /**
@@ -117,14 +155,34 @@ function sendRichTextExplicit(guild, channel, author, title, categories, color, 
  * @param {string} footer
  * @return {Promise<(Discord.Message|Array<Discord.Message>)>}
  */
-function sendRichText(msg, title, categories, color, image, description, thumbnail, url, footer) {
-  return sendRichTextExplicit(msg.guild, msg.channel, msg.author,
-      title, categories, color, image, description, thumbnail, url);
+function sendRichText(
+  msg,
+  title,
+  categories,
+  color,
+  image,
+  description,
+  thumbnail,
+  url,
+  footer
+) {
+  return sendRichTextExplicit(
+    msg.guild,
+    msg.channel,
+    msg.author,
+    title,
+    categories,
+    color,
+    image,
+    description,
+    thumbnail,
+    url
+  )
 }
 
 export default {
   sendRichText,
   sendRichTextExplicit,
   sendRichTextDefault,
-  sendRichTextDefaultExplicit,
-};
+  sendRichTextDefaultExplicit
+}
