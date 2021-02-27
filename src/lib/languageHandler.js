@@ -1,9 +1,11 @@
 import fs from 'fs'
 import config from '../config'
 
-const dic = JSON.parse(
-  fs.readFileSync(`./src/assets/language/${config.language}.json`)
-)
+const dic = {
+  lang: JSON.parse(
+    fs.readFileSync(`./src/assets/language/${config.language}.json`).toString()
+  )
+}
 
 /**
  * Changes the language to the given language unicode
@@ -18,7 +20,9 @@ function changeLanguage(lang) {
   }
 
   // If the file exists, continue
-  dic = JSON.parse(fs.readFileSync(`./src/assets/language/${lang}.json`))
+  dic.lang = JSON.parse(
+    fs.readFileSync(`./src/assets/language/${lang}.json`).toString()
+  )
 
   console.info(`Changing lang from '${config.language}' to '${lang}'`)
   config.language = lang
