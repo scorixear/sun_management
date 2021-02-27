@@ -1,43 +1,53 @@
-// import packages
-import msgHandler from './../misc/messageHandler.js'
-import config from './../config.js'
-// eslint-disable-next-line no-unused-vars
-import Discord from 'discord.js'
-import { dic as language, replaceArgs } from '../misc/languageHandler'
+import Discord from 'discord.js';
+
+import msgHandler from '../lib/messageHandler';
+import config from '../config';
+import { dic as language, replaceArgs } from '../lib/languageHandler';
 
 /**
  * Checks if the user has permissions and prints a message if not
- * @param {Array<string>} permissions
+ * @param {Discord.PermissionResolvable} permissions
  * @param {Discord.Message} msg
  * @param {string} command
  * @return {boolean}
  */
 function checkPermissions(permissions, msg, command) {
-  const user = msg.member
+  const user = msg.member;
   if (user.hasPermission(permissions) == false) {
-    msgHandler.sendRichText(msg, language.general.error, [
-      {
-        title: language.general.message,
-        text: replaceArgs(language.handlers.permissions.error, [
-          config.botPrefix,
-          command
-        ])
-      }
-    ])
-    return false
+    msgHandler.sendRichText({
+      msg,
+      title: language.general.error,
+      categories: [
+        {
+          title: language.general.message,
+          text: replaceArgs(language.handlers.permissions.error, [
+            config.botPrefix,
+            command
+          ]),
+          inline: undefined
+        }
+      ],
+      color: undefined,
+      image: undefined,
+      description: undefined,
+      thumbnail: undefined,
+      url: undefined,
+      footer: undefined
+    });
+    return false;
   }
-  return true
+  return true;
 }
 
 /**
  * Checks if the user has permissions
- * @param {Array<string>} permissions
+ * @param {Discord.PermissionResolvable} permissions
  * @param {Discord.Message} msg
  * @return {boolean}
  */
 function checkPermissionSilent(permissions, msg) {
-  const user = msg.member
-  return user.hasPermission(permissions)
+  const user = msg.member;
+  return user.hasPermission(permissions);
 }
 
-export default { checkPermissions, checkPermissionSilent }
+export default { checkPermissions, checkPermissionSilent };
