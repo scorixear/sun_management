@@ -2,6 +2,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "module": "es6",
+    "moduleResolution": "node",
     "target": "esnext",
     "checkJs": true,
     "allowSyntheticDefaultImports": true
