@@ -13,7 +13,7 @@ DiscordHandler.client.on('ready', () => {
   DiscordHandler.client.user.setActivity('🦆Quack');
   // start the interval in which the roles of members will be registered.
   setInterval(() => {
-    albionApiHandler.clearAlbionMembers();
+    albionApiHandler.removeMemberRoles();
   }, 24 * 60 * 60 * 1000);
 });
 
