@@ -1,36 +1,47 @@
 import fs from 'fs'
-import config from '../config.js'
+import config from '../config'
 
-export let dic = JSON.parse(
+const dic = JSON.parse(
   fs.readFileSync(`./src/assets/language/${config.language}.json`)
 )
 
 /**
  * Changes the language to the given language unicode
- * @param {string} lang
- * @return {bool} False if File did not exist
+ * @param {String} - Language to change to
+ * @return {Boolean} - False if File did not exist
  */
-export function changeLanguage(lang) {
+function changeLanguage(lang) {
+  // Look for the given language in 'src/assets/language'
   if (!fs.existsSync(`./src/assets/language/${lang}.json`)) {
+    console.error(`Could not find language file for '${lang}'`)
     return false
-  } else {
-    dic = JSON.parse(fs.readFileSync(`./src/assets/language/${lang}.json`))
-    config.language = lang
-    fs.writeFileSync('./src/config.json', JSON.stringify(config, null, 2))
-    languageTag = lang
-    return true
   }
+
+  // If the file exists, continue
+  dic = JSON.parse(fs.readFileSync(`./src/assets/language/${lang}.json`))
+
+  console.info(`Changing lang from '${config.language}' to '${lang}'`)
+  config.language = lang
+
+  fs.writeFileSync('./src/config.json', JSON.stringify(config, null, 2))
+  // languageTag = lang <<< Has no use, commenting for now
+  return true
 }
 
 /**
  * Replaces preset args with values in a string
- * @param {string} input
- * @param {Array.<string>} args
- * @return {string} the filled string
+ * @param {String} input
+ * @param {Array<String>} args
+ * @return {String} the filled string
  */
-export function replaceArgs(input, args) {
-  for (let i = 0; i < args.length; i++) {
-    input = input.split('$' + i).join(args[i])
-  }
-  return input
+function replaceArgs(input, args) {
+  let replacedInput = input
+
+  args.forEach((_, idx) => {
+    replacedInput = input.split('$' + idx).join(args[idx])
+  })
+
+  return replacedInput
 }
+
+export { dic, changeLanguage, replaceArgs }
