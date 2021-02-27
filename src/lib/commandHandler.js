@@ -1,26 +1,28 @@
-import config from './../config.js'
-import msgHandler from './../misc/messageHandler.js'
 import Fs from 'fs'
-import emojiHandler from './EmojiHandler.js'
-import levenshteinDistance from './LevenshteinDistance.js'
-// eslint-disable-next-line no-unused-vars
 import { Message } from 'discord.js'
-import { dic as language, replaceArgs } from './languageHandler.js'
 
-const commandFiles = Fs.readdirSync('./src/commands/')
+import config from '../config'
+import msgHandler from './messageHandler'
+import emojiHandler from './emojiHandler'
+import levenshteinDistance from './LevenshteinDistance'
+import { dic as language, replaceArgs } from './languageHandler'
+
+const commandFiles = Fs.readdirSync('./src/commands')
 const commands = []
-commandFiles.forEach((folder) => {
-  if (folder !== 'command.js') {
-    Fs.readdirSync(`./src/commands/${folder}/`).forEach((file) => {
-      if (file.endsWith('.js')) {
-        const command = require(`./../commands/${folder}/${file}`)
-        console.log(command)
+
+commandFiles.forEach((fileName) => {
+  if (fileName !== 'command.js') {
+    commandFiles.forEach((file) => {
+      if (file !== 'command.js' && file.endsWith('.js')) {
+        const command = require(`../commands/${file}`)
+        console.debug(command)
+
         if (command.commands) {
           for (const cmd of command.commands) {
-            commands.push(Reflect.construct(cmd, [folder]))
+            commands.push(Reflect.construct(cmd, [fileName]))
           }
         } else {
-          commands.push(Reflect.construct(command.default, [folder]))
+          commands.push(Reflect.construct(command.default, [fileName]))
         }
       }
     })
@@ -77,77 +79,111 @@ function parseCommand(msg) {
       },
       [args, params]
     )
+
     return
   }
   // otherwise execute command
   try {
     module.executeCommand(args, msg, params)
   } catch (err) {
-    // if any error occured during executing print a message
+    // if any error occurred during executing print a message
     console.log(err)
-    msgHandler.sendRichText(msg, language.general.error, [
-      {
-        title: language.general.message,
-        text: replaceArgs(language.handlers.command.error.generic_error, [
-          config.botPrefix,
-          command
-        ])
-      }
-    ])
+    msgHandler.sendRichText({
+      msg,
+      title: language.general.error,
+      description: undefined,
+      categories: [
+        {
+          title: language.general.message,
+          text: replaceArgs(language.handlers.command.error.generic_error, [
+            config.botPrefix,
+            command
+          ])
+        }
+      ],
+      color: undefined,
+      image: undefined,
+      thumbnail: undefined,
+      url: undefined,
+      footer: undefined
+    })
   }
 }
 
 /**
  * Parses a string to arguments
  * @param {Message} msg
- * @param {string} messageargs the string to parse
+ * @param {string} msgArgs the string to parse
  * @return {Array<string>}
  */
-function parseArgs(msg, messageargs) {
+function parseArgs(msg, msgArgs) {
   const argsRegex = /(?: +([^ "]+|"[^"]*"))/g
-  if (!argsRegex.test(messageargs)) {
-    msgHandler.sendRichText(msg, language.general.error, [
-      {
-        title: language.general.message,
-        text: language.handlers.command.error.args_format
-      }
-    ])
+  if (!argsRegex.test(msgArgs)) {
+    msgHandler.sendRichText({
+      msg,
+      title: language.general.error,
+      description: undefined,
+      categories: [
+        {
+          title: language.general.message,
+          text: language.handlers.command.error.args_format
+        }
+      ],
+      color: undefined,
+      image: undefined,
+      thumbnail: undefined,
+      url: undefined,
+      footer: undefined
+    })
     return
   }
+
   argsRegex.lastIndex = 0
   const argsArray = []
   let temp
-  while ((temp = argsRegex.exec(messageargs))) {
+
+  while ((temp = argsRegex.exec(msgArgs))) {
     if (temp[1].startsWith('"') && temp[1].endsWith('"')) {
       argsArray.push(temp[1].substring(1, temp[1].length - 1))
     } else {
       argsArray.push(temp[1])
     }
   }
+
   return argsArray
 }
 
 /**
  * Parses a string for parameters
  * @param {Message} msg
- * @param {string} messageParams the string to parse for params
+ * @param {string} msgParams the string to parse for params
  * @return {{}}
  */
-function parseParams(msg, messageParams) {
+function parseParams(msg, msgParams) {
   const paramsRegex = / +(--[^ ]+)(?: +([^ "-]+|"[^"]*"))?/g
-  if (!paramsRegex.test(messageParams)) {
-    msgHandler.sendRichText(msg, language.general.error, [
-      {
-        title: language.general.message,
-        text: language.handlers.command.error.params_format
-      }
-    ])
+  if (!paramsRegex.test(msgParams)) {
+    msgHandler.sendRichText({
+      msg,
+      title: language.general.error,
+      description: undefined,
+      categories: [
+        {
+          title: language.general.message,
+          text: language.handlers.command.error.params_format
+        }
+      ],
+      color: undefined,
+      image: undefined,
+      thumbnail: undefined,
+      url: undefined,
+      footer: undefined
+    })
     return
   }
   paramsRegex.lastIndex = 0
   const rawParams = []
   let temp
-  while ((temp = paramsRegex.exec(messageParams))) {
+  while ((temp = paramsRegex.exec(msgParams))) {
     rawParams.push(temp[1])
     if (temp[2]) {
       rawParams.push(temp[2])
@@ -179,13 +215,24 @@ function parseParams(msg, messageParams) {
  */
 function parseWithoutCommand(msg, attributes, generalError) {
   const regex = /^((?:(?!--).)+)?( +--.+)?$/
-  if (!regex.test(attributes)) {
-    msgHandler.sendRichText(msg, language.general.error, [
-      {
-        title: language.general.message,
-        text: generalError
-      }
-    ])
+
+  if (attributes.map((att) => !regex.test(att))) {
+    msgHandler.sendRichText({
+      msg,
+      title: language.general.error,
+      description: undefined,
+      categories: [
+        {
+          title: language.general.message,
+          text: generalError
+        }
+      ],
+      color: undefined,
+      image: undefined,
+      thumbnail: undefined,
+      url: undefined,
+      footer: undefined
+    })
     return
   }
 
@@ -202,7 +249,7 @@ function parseWithoutCommand(msg, attributes, generalError) {
   } else {
     params = {}
   }
-  return { args: args, params: params }
+  return { args, params }
 }
 
 /**
@@ -215,14 +262,24 @@ function parseCommandParams(msg) {
     '^\\' + `${config.botPrefix}([^ ]+)((?:(?!--).)+)?( +--.+)?$`
   )
   if (!regex.test(msg.content)) {
-    msgHandler.sendRichText(msg, language.general.error, [
-      {
-        title: language.general.message,
-        text: replaceArgs(language.handlers.command.error.general_format, [
-          config.botPrefix
-        ])
-      }
-    ])
+    msgHandler.sendRichText({
+      msg,
+      title: language.general.error,
+      description: undefined,
+      categories: [
+        {
+          title: language.general.message,
+          text: replaceArgs(language.handlers.command.error.general_format, [
+            config.botPrefix
+          ])
+        }
+      ],
+      color: undefined,
+      image: undefined,
+      thumbnail: undefined,
+      url: undefined,
+      footer: undefined
+    })
     return
   }
   const regexSplit = regex.exec(msg.content)
@@ -239,7 +296,7 @@ function parseCommandParams(msg) {
   } else {
     params = {}
   }
-  return { command: command, args: args, params: params }
+  return { command, args, params }
 }
 
 export default {
