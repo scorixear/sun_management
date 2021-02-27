@@ -1,70 +1,70 @@
-import Fs from 'fs'
-import { Message } from 'discord.js'
+import Fs from 'fs';
+import { Message } from 'discord.js';
 
-import config from '../config'
-import msgHandler from './messageHandler'
-import emojiHandler from './emojiHandler'
-import levenshteinDistance from './LevenshteinDistance'
-import { dic as language, replaceArgs } from './languageHandler'
+import config from '../config';
+import msgHandler from './messageHandler';
+import emojiHandler from './emojiHandler';
+import levenshteinDistance from './LevenshteinDistance';
+import { dic as language, replaceArgs } from './languageHandler';
 
-const commandFiles = Fs.readdirSync('./src/commands')
-const commands = []
+const commandFiles = Fs.readdirSync('./src/commands');
+const commands = [];
 
 commandFiles.forEach((fileName) => {
   if (fileName !== 'command.js') {
     commandFiles.forEach((file) => {
       if (file !== 'command.js' && file.endsWith('.js')) {
-        const command = require(`../commands/${file}`)
-        console.debug(command)
+        const command = require(`../commands/${file}`);
+        console.debug(command);
 
         if (command.commands) {
           for (const cmd of command.commands) {
-            commands.push(Reflect.construct(cmd, [fileName]))
+            commands.push(Reflect.construct(cmd, [fileName]));
           }
         } else {
-          commands.push(Reflect.construct(command.default, [fileName]))
+          commands.push(Reflect.construct(command.default, [fileName]));
         }
       }
-    })
+    });
   }
-})
+});
 
 /**
  * Parses the Command
  * @param {Message} msg
  */
 function parseCommand(msg) {
-  let module
-  let command
-  let args
-  let params
+  let module;
+  let command;
+  let args;
+  let params;
   // if does not start with prefix, return;
-  if (msg.content[0] !== config.botPrefix) return
+  if (msg.content[0] !== config.botPrefix) return;
   // else if (msg.channel.name !== config.botChannel) return;
   // else if (msg.guild.name !== config.botGuild) return;
   else {
     // parses Command Parameters
-    const temp = parseCommandParams(msg)
-    if (!temp) return
-    command = temp.command
-    args = temp.args
-    params = temp.params
+    const temp = parseCommandParams(msg);
+    if (!temp) return;
+    command = temp.command;
+    args = temp.args;
+    params = temp.params;
     // find class that represents the given command
     module = commands.find(
       (c) => c.command.toLowerCase() === command.toLowerCase()
-    )
+    );
   }
   // if no command was found
   if (!module || !module.executeCommand) {
-    const commandOptions = commands.map((c) => c.command)
+    const commandOptions = commands.map((c) => c.command);
     const message = replaceArgs(language.handlers.command.error.unknown, [
       config.botPrefix
-    ])
+    ]);
     // calculate levenshteinDistance to the closest command
     const possible = levenshteinDistance.findClosestMatch(
       command.toLowerCase(),
       commandOptions
-    )
+    );
     // resolve it with reactions
     emojiHandler.resolveWithReaction(
       msg,
@@ -74,20 +74,20 @@ function parseCommand(msg) {
       (c, m, a) => {
         module = commands.find(
           (x) => x.command.toLowerCase() == c.toLowerCase()
-        )
-        module.executeCommand(a[0], m, a[1])
+        );
+        module.executeCommand(a[0], m, a[1]);
       },
       [args, params]
-    )
+    );
 
-    return
+    return;
   }
   // otherwise execute command
   try {
-    module.executeCommand(args, msg, params)
+    module.executeCommand(args, msg, params);
   } catch (err) {
     // if any error occurred during executing print a message
-    console.log(err)
+    console.log(err);
     msgHandler.sendRichText({
       msg,
       title: language.general.error,
@@ -106,7 +106,7 @@ function parseCommand(msg) {
       thumbnail: undefined,
       url: undefined,
       footer: undefined
-    })
+    });
   }
 }
 
@@ -117,7 +117,7 @@ function parseCommand(msg) {
  * @return {Array<string>}
  */
 function parseArgs(msg, msgArgs) {
-  const argsRegex = /(?: +([^ "]+|"[^"]*"))/g
+  const argsRegex = /(?: +([^ "]+|"[^"]*"))/g;
   if (!argsRegex.test(msgArgs)) {
     msgHandler.sendRichText({
       msg,
@@ -134,23 +134,23 @@ function parseArgs(msg, msgArgs) {
       thumbnail: undefined,
       url: undefined,
       footer: undefined
-    })
-    return
+    });
+    return;
   }
 
-  argsRegex.lastIndex = 0
-  const argsArray = []
-  let temp
+  argsRegex.lastIndex = 0;
+  const argsArray = [];
+  let temp;
 
   while ((temp = argsRegex.exec(msgArgs))) {
     if (temp[1].startsWith('"') && temp[1].endsWith('"')) {
-      argsArray.push(temp[1].substring(1, temp[1].length - 1))
+      argsArray.push(temp[1].substring(1, temp[1].length - 1));
     } else {
-      argsArray.push(temp[1])
+      argsArray.push(temp[1]);
     }
   }
 
-  return argsArray
+  return argsArray;
 }
 
 /**
@@ -160,7 +160,7 @@ function parseArgs(msg, msgArgs) {
  * @return {{}}
  */
 function parseParams(msg, msgParams) {
-  const paramsRegex = / +(--[^ ]+)(?: +([^ "-]+|"[^"]*"))?/g
+  const paramsRegex = / +(--[^ ]+)(?: +([^ "-]+|"[^"]*"))?/g;
   if (!paramsRegex.test(msgParams)) {
     msgHandler.sendRichText({
       msg,
@@ -177,33 +177,33 @@ function parseParams(msg, msgParams) {
       thumbnail: undefined,
       url: undefined,
       footer: undefined
-    })
-    return
+    });
+    return;
   }
-  paramsRegex.lastIndex = 0
-  const rawParams = []
-  let temp
+  paramsRegex.lastIndex = 0;
+  const rawParams = [];
+  let temp;
   while ((temp = paramsRegex.exec(msgParams))) {
-    rawParams.push(temp[1])
+    rawParams.push(temp[1]);
     if (temp[2]) {
-      rawParams.push(temp[2])
+      rawParams.push(temp[2]);
     }
   }
-  let lastOption
-  const params = {}
+  let lastOption;
+  const params = {};
   for (let i = 0; i < rawParams.length; i++) {
-    let current = rawParams[i]
+    let current = rawParams[i];
     if (current.startsWith('--')) {
-      lastOption = current.substring(2)
-      params[lastOption] = ''
+      lastOption = current.substring(2);
+      params[lastOption] = '';
     } else {
       if (current.startsWith('"') && current.endsWith('"')) {
-        current = current.substring(1, current.length - 1)
+        current = current.substring(1, current.length - 1);
       }
-      params[lastOption] = current
+      params[lastOption] = current;
     }
   }
-  return params
+  return params;
 }
 
 /**
@@ -214,7 +214,7 @@ function parseParams(msg, msgParams) {
  * @return {{args: Array<string>, params: {}}}
  */
 function parseWithoutCommand(msg, attributes, generalError) {
-  const regex = /^((?:(?!--).)+)?( +--.+)?$/
+  const regex = /^((?:(?!--).)+)?( +--.+)?$/;
 
   if (attributes.map((att) => !regex.test(att))) {
     msgHandler.sendRichText({
@@ -232,24 +232,24 @@ function parseWithoutCommand(msg, attributes, generalError) {
       thumbnail: undefined,
       url: undefined,
       footer: undefined
-    })
-    return
+    });
+    return;
   }
 
-  const regexSplit = regex.exec(attributes)
-  let args = regexSplit[1]
-  let params = regexSplit[2]
+  const regexSplit = regex.exec(attributes);
+  let args = regexSplit[1];
+  let params = regexSplit[2];
   if (args) {
-    args = parseArgs(msg, ' ' + args)
+    args = parseArgs(msg, ' ' + args);
   } else {
-    args = []
+    args = [];
   }
   if (params) {
-    params = parseParams(msg, params)
+    params = parseParams(msg, params);
   } else {
-    params = {}
+    params = {};
   }
-  return { args, params }
+  return { args, params };
 }
 
 /**
@@ -260,7 +260,7 @@ function parseWithoutCommand(msg, attributes, generalError) {
 function parseCommandParams(msg) {
   const regex = new RegExp(
     '^\\' + `${config.botPrefix}([^ ]+)((?:(?!--).)+)?( +--.+)?$`
-  )
+  );
   if (!regex.test(msg.content)) {
     msgHandler.sendRichText({
       msg,
@@ -279,27 +279,27 @@ function parseCommandParams(msg) {
       thumbnail: undefined,
       url: undefined,
       footer: undefined
-    })
-    return
+    });
+    return;
   }
-  const regexSplit = regex.exec(msg.content)
-  const command = regexSplit[1]
-  let args = regexSplit[2]
-  let params = regexSplit[3]
+  const regexSplit = regex.exec(msg.content);
+  const command = regexSplit[1];
+  let args = regexSplit[2];
+  let params = regexSplit[3];
   if (args) {
-    args = parseArgs(msg, args)
+    args = parseArgs(msg, args);
   } else {
-    args = []
+    args = [];
   }
   if (params) {
-    params = parseParams(msg, params)
+    params = parseParams(msg, params);
   } else {
-    params = {}
+    params = {};
   }
-  return { command, args, params }
+  return { command, args, params };
 }
 
 export default {
   parseCommand,
   commands
-}
+};
