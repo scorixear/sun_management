@@ -16,11 +16,11 @@ function checkPermissions(permissions, msg, command) {
   if (user.hasPermission(permissions) == false) {
     msgHandler.sendRichText({
       msg,
-      title: language.general.error,
+      title: language.lang.general.error,
       categories: [
         {
-          title: language.general.message,
-          text: replaceArgs(language.handlers.permissions.error, [
+          title: language.lang.general.message,
+          text: replaceArgs(language.lang.handlers.permissions.error, [
             config.botPrefix,
             command
           ]),

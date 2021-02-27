@@ -49,7 +49,7 @@ function getCustomClientEmoji(name) {
 
 /**
  * Transforms given numbers to emoji numbers
- * @param {number} number the number to transfrom
+ * @param {number} number the number to transform
  * @return {string} the emoji
  */
 function getGlobalDiscordEmoji(number) {
@@ -66,7 +66,7 @@ function getNumberFromEmoji(emoji) {
 }
 
 /**
- * This callback is displayed as part of the resolveWithReaction funciton
+ * This callback is displayed as part of the resolveWithReaction function
  * @callback resolveCallback
  * @param {string} option the chosen option
  * @param {Message} msg the given Message Object
@@ -93,7 +93,7 @@ function resolveWithReaction(
   const reactEmojis = [];
   let commandList;
   if (options && options.length > 0) {
-    commandList = language.handlers.emoji.labels.did_you_mean;
+    commandList = language.lang.handlers.emoji.labels.did_you_mean;
     for (let i = 0; i < options.length; i++) {
       const emoji = getGlobalDiscordEmoji(i);
       commandList += `\n${emoji} \`${options[i]}`;
@@ -107,23 +107,33 @@ function resolveWithReaction(
 
   const categories = [
     {
-      title: language.general.message,
+      title: language.lang.general.message,
       text: messageString
     }
   ];
   if (commandList) {
     categories.push({
-      title: language.handlers.emoji.labels.synonyms,
+      title: language.lang.handlers.emoji.labels.synonyms,
       text: commandList
     });
     categories.push({
-      title: language.general.usage,
-      text: language.handlers.emoji.labels.usage
+      title: language.lang.general.usage,
+      text: language.lang.handlers.emoji.labels.usage
     });
   }
 
   messageHandler
-    .sendRichText(msg, language.general.error, categories)
+    .sendRichText({
+      msg,
+      title: language.lang.general.error,
+      description: undefined,
+      categories,
+      color: undefined,
+      image: undefined,
+      thumbnail: undefined,
+      url: undefined,
+      footer: undefined
+    })
     .then((m) => {
       reactEmojis.forEach((e) => m.react(e));
       return m;

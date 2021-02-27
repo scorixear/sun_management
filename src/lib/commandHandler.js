@@ -57,7 +57,7 @@ function parseCommand(msg) {
   // if no command was found
   if (!module || !module.executeCommand) {
     const commandOptions = commands.map((c) => c.command);
-    const message = replaceArgs(language.handlers.command.error.unknown, [
+    const message = replaceArgs(language.lang.handlers.command.error.unknown, [
       config.botPrefix
     ]);
     // calculate levenshteinDistance to the closest command
@@ -90,15 +90,15 @@ function parseCommand(msg) {
     console.log(err);
     msgHandler.sendRichText({
       msg,
-      title: language.general.error,
+      title: language.lang.general.error,
       description: undefined,
       categories: [
         {
           title: language.general.message,
-          text: replaceArgs(language.handlers.command.error.generic_error, [
-            config.botPrefix,
-            command
-          ])
+          text: replaceArgs(
+            language.lang.handlers.command.error.generic_error,
+            [config.botPrefix, command]
+          )
         }
       ],
       color: undefined,
@@ -121,12 +121,12 @@ function parseArgs(msg, msgArgs) {
   if (!argsRegex.test(msgArgs)) {
     msgHandler.sendRichText({
       msg,
-      title: language.general.error,
+      title: language.lang.general.error,
       description: undefined,
       categories: [
         {
-          title: language.general.message,
-          text: language.handlers.command.error.args_format
+          title: language.lang.general.message,
+          text: language.lang.handlers.command.error.args_format
         }
       ],
       color: undefined,
@@ -164,12 +164,12 @@ function parseParams(msg, msgParams) {
   if (!paramsRegex.test(msgParams)) {
     msgHandler.sendRichText({
       msg,
-      title: language.general.error,
+      title: language.lang.general.error,
       description: undefined,
       categories: [
         {
-          title: language.general.message,
-          text: language.handlers.command.error.params_format
+          title: language.lang.general.message,
+          text: language.lang.handlers.command.error.params_format
         }
       ],
       color: undefined,
@@ -219,11 +219,11 @@ function parseWithoutCommand(msg, attributes, generalError) {
   if (attributes.map((att) => !regex.test(att))) {
     msgHandler.sendRichText({
       msg,
-      title: language.general.error,
+      title: language.lang.general.error,
       description: undefined,
       categories: [
         {
-          title: language.general.message,
+          title: language.lang.general.message,
           text: generalError
         }
       ],
@@ -264,14 +264,15 @@ function parseCommandParams(msg) {
   if (!regex.test(msg.content)) {
     msgHandler.sendRichText({
       msg,
-      title: language.general.error,
+      title: language.lang.general.error,
       description: undefined,
       categories: [
         {
-          title: language.general.message,
-          text: replaceArgs(language.handlers.command.error.general_format, [
-            config.botPrefix
-          ])
+          title: language.lang.general.message,
+          text: replaceArgs(
+            language.lang.handlers.command.error.general_format,
+            [config.botPrefix]
+          )
         }
       ],
       color: undefined,
