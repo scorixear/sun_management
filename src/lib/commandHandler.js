@@ -10,22 +10,18 @@ import { dic as language, replaceArgs } from './languageHandler';
 const commandFiles = Fs.readdirSync('./src/commands');
 const commands = [];
 
-commandFiles.forEach((fileName) => {
-  if (fileName !== 'command.js') {
-    commandFiles.forEach((file) => {
-      if (file !== 'command.js' && file.endsWith('.js')) {
-        const command = require(`../commands/${file}`);
-        console.debug(command);
+commandFiles.map((fileName) => {
+  if (fileName !== 'command.js' && fileName.endsWith('.js')) {
+    const command = require(`../commands/${fileName}`);
+    console.debug(command);
 
-        if (command.commands) {
-          for (const cmd of command.commands) {
-            commands.push(Reflect.construct(cmd, [fileName]));
-          }
-        } else {
-          commands.push(Reflect.construct(command.default, [fileName]));
-        }
+    if (command.commands) {
+      for (const cmd of command.commands) {
+        commands.push(Reflect.construct(cmd, [fileName]));
       }
-    });
+    } else {
+      commands.push(Reflect.construct(command.default, [fileName]));
+    }
   }
 });
 
