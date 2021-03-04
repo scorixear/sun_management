@@ -107,12 +107,12 @@ export default class Register extends Command {
     }
 
     // if player is not already entered
-    if (await sqlHandler.findPlayer(user.id)) {
+    if (!(await sqlHandler.findPlayer(user.id))) {
       console.log(`Saving player ${user.id} as in-game ${args[1]}`);
       // save entry
       returnValue = await sqlHandler.savePlayer(user.id, args[1]);
     } else {
-      console.log(`Editing player`);
+      console.log(`Editing player ${user.id}`);
       // edit entry
       returnValue = await sqlHandler.editPlayer(user.id, args[1]);
     }
