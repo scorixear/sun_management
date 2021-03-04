@@ -1,4 +1,4 @@
-import Fs from 'fs';
+import fs from 'fs';
 import { Message } from 'discord.js';
 
 import config from '../config';
@@ -7,24 +7,26 @@ import emojiHandler from './emojiHandler';
 import levenshteinDistance from './LevenshteinDistance';
 import { dic as language, replaceArgs } from './languageHandler';
 
-const commandFiles = Fs.readdirSync('./src/commands');
+const commandFiles = fs.readdirSync('src/commands');
 const commands = [];
 
-commandFiles.map((fileName) => {
-  if (fileName !== 'command.js' && fileName.endsWith('.js')) {
-    const command = require(`../commands/${fileName}`);
-    console.debug(command);
-
-    if (command.commands) {
-      for (const cmd of command.commands) {
-        commands.push(Reflect.construct(cmd, [fileName]));
+commandFiles.forEach((folder) => {
+  if (folder !== 'command.js') {
+    fs.readdirSync(`./src/commands/${folder}/`).forEach((file) => {
+      if (file.endsWith('.js')) {
+        const command = require(`./../commands/${folder}/${file}`);
+        //   console.log(command);
+        if (command.commands) {
+          for (const cmd of command.commands) {
+            commands.push(Reflect.construct(cmd, [folder]));
+          }
+        } else {
+          commands.push(Reflect.construct(command.default, [folder]));
+        }
       }
-    } else {
-      commands.push(Reflect.construct(command.default, [fileName]));
-    }
+    });
   }
 });
-
 /**
  * Parses the Command
  * @param {Message} msg
@@ -83,7 +85,7 @@ function parseCommand(msg) {
     module.executeCommand(args, msg, params);
   } catch (err) {
     // if any error occurred during executing print a message
-    console.log(err);
+    console.error(err);
     msgHandler.sendRichText({
       msg,
       title: language.lang.general.error,
@@ -113,7 +115,9 @@ function parseCommand(msg) {
  * @return {Array<string>}
  */
 function parseArgs(msg, msgArgs) {
+  console.log('Args parsed args: ' + msgArgs);
   const argsRegex = /(?: +([^ "]+|"[^"]*"))/g;
+
   if (!argsRegex.test(msgArgs)) {
     msgHandler.sendRichText({
       msg,
@@ -131,6 +135,7 @@ function parseArgs(msg, msgArgs) {
       url: undefined,
       footer: undefined
     });
+
     return;
   }
 
@@ -156,6 +161,7 @@ function parseArgs(msg, msgArgs) {
  * @return {{}}
  */
 function parseParams(msg, msgParams) {
+  console.log('Params parsed msg: ' + msg);
   const paramsRegex = / +(--[^ ]+)(?: +([^ "-]+|"[^"]*"))?/g;
   if (!paramsRegex.test(msgParams)) {
     msgHandler.sendRichText({
@@ -254,6 +260,7 @@ function parseWithoutCommand(msg, attributes, generalError) {
  * @return {{command: String, args: Array<String>, params: {}}} the parsed command
  */
 function parseCommandParams(msg) {
+  console.log('Command param parsed msg: ' + msg);
   const regex = new RegExp(
     '^\\' + `${config.botPrefix}([^ ]+)((?:(?!--).)+)?( +--.+)?$`
   );

@@ -24,7 +24,7 @@ function changeLanguage(lang) {
     fs.readFileSync(`./src/assets/language/${lang}.json`).toString()
   );
 
-  console.info(`Changing lang from '${config.language}' to '${lang}'`);
+  console.log(`Changing lang from '${config.language}' to '${lang}'`);
   config.language = lang;
 
   fs.writeFileSync('./src/config.json', JSON.stringify(config, null, 2));
@@ -39,13 +39,10 @@ function changeLanguage(lang) {
  * @return {String} the filled string
  */
 function replaceArgs(input, args) {
-  let replacedInput = input;
-
-  args.forEach((_, idx) => {
-    replacedInput = input.split('$' + idx).join(args[idx]);
-  });
-
-  return replacedInput;
+  for (let i = 0; i < args.length; i++) {
+    input = input.split('$' + i).join(args[i]);
+  }
+  return input;
 }
 
 export { dic, changeLanguage, replaceArgs };

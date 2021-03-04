@@ -1,11 +1,11 @@
 import { Message } from 'discord.js';
 
-import Command from './command';
-import messageHandler from '../lib/messageHandler';
-import { dic as language } from '../lib/languageHandler';
+import Command from '../command';
+import messageHandler from '../../lib/messageHandler';
+import { dic as language } from '../../lib/languageHandler';
 // import config from '../config.js'
 // import sqlHandler from '../lib/sqlHandler.js'
-import albionApiHandler from '../lib/albionApiHandler';
+import albionApiHandler from '../../lib/albionApiHandler';
 
 export default class RemoveMembers extends Command {
   constructor(category) {
@@ -46,6 +46,6 @@ export default class RemoveMembers extends Command {
       image: undefined
     });
 
-    await albionApiHandler.clearAlbionMembers();
+    await albionApiHandler.removeMemberRoles();
   }
 }

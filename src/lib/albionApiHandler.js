@@ -12,18 +12,19 @@ const members = [];
 const guildIds = [];
 
 const allGuildsCache = discordHandler.client.guilds.cache;
-const allGuildsArr = Array.from(allGuildsCache.flatMap);
 
 /**
  * Removes the roles from the players
  */
 async function removeRoles() {
   const playersToRemove = [];
-  for (const guild of allGuildsArr) {
+  // console.log(allGuildsCache);
+  for (const guild of allGuildsCache) {
     playersToRemove.push(
       await discordHandler.removeRolesFromPlayers(guild[1], members)
     );
   }
+
   return playersToRemove;
 }
 
@@ -36,24 +37,24 @@ async function removeMemberRoles() {
     await searchGuildIds();
   }
   // for each guild id
-  guildIds.map(async (guildId) => {
-    console.debug(`Clearing former members from guild ${guildId}`);
-
+  for (const guildId of guildIds) {
+    console.log(`${baseUri}guilds/${guildId}/members`);
     try {
       // retrieve the members list
       const res = await doRequest(`${baseUri}guilds/${guildId}/members`);
-      console.debug(res);
-
+      // console.debug(res);
       addGuildMembers(res);
     } catch {
       return;
     }
-  });
+  }
+
+  console.log(`Do we have member?\n${members}`);
 
   // Remove the roles
-  let removedPlayers = await removeRoles();
+  const removedPlayers = await removeRoles();
   // Send message with removed players in each specified Discord guild
-  for (const guild of allGuildsArr) {
+  for (const guild of allGuildsCache) {
     const channel = guild[1].channels.cache.find(
       (channel) => channel.name === config.removeChannel
     );
@@ -93,7 +94,7 @@ async function removeMemberRoles() {
 function addGuildMembers(arg) {
   arg.forEach((playerInfo) => {
     // Debug:
-    console.debug(playerInfo);
+    // console.debug(playerInfo);
     // Push name to members list
     members.push(playerInfo.Name);
   });
@@ -102,11 +103,12 @@ function addGuildMembers(arg) {
 /**
  * Search Guild IDs
  */
+
 async function searchGuildIds() {
-  config.trackedGuild.map(async (guildName) => {
+  for (const guildName of config.trackedGuilds) {
     try {
-      const res = await doRequest(`${baseUri}${searchQueryStr}${guildName}`);
-      for (const guildInfo of res.guilds) {
+      const body = await doRequest(`${baseUri}${searchQueryStr}${guildName}`);
+      for (const guildInfo of body.guilds) {
         if (config.trackedGuilds.includes(guildInfo.Name)) {
           guildIds.push(guildInfo.Id);
         }
@@ -114,7 +116,7 @@ async function searchGuildIds() {
     } catch {
       return;
     }
-  });
+  }
 }
 
 /**

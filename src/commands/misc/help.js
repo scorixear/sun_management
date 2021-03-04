@@ -1,11 +1,11 @@
 import Discord from 'discord.js';
 
-import cmdHandler from '../lib/commandHandler';
-import msgHandler from '../lib/messageHandler';
-import permHandler from '../lib/permissionHandler';
-import config from '../config';
-import Command from './command';
-import { dic as language, replaceArgs } from '../lib/languageHandler';
+import cmdHandler from '../../lib/commandHandler';
+import msgHandler from '../../lib/messageHandler';
+import permHandler from '../../lib/permissionHandler';
+import config from '../../config';
+import Command from '../command';
+import { dic as language, replaceArgs } from '../../lib/languageHandler';
 
 export default class Help extends Command {
   constructor(category) {
@@ -57,6 +57,7 @@ export default class Help extends Command {
           });
           return;
         }
+
         // parse command variables
         const example =
           '```' +

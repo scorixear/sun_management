@@ -24,8 +24,8 @@ DiscordHandler.client.on(
   CmdHandler ? CmdHandler.parseCommand : () => {}
 );
 
-// Initialize the Database, if needed <<<< Is it needed or not? If not, it needs a function to not initialize when the file is read
+// Initialize the Database
 SqlHandler.initDB().then(() => {
-  // after that login the client to the connected servers
+  // after that, log the client to the specified server(s)
   DiscordHandler.client.login(config.token);
 });

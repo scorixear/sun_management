@@ -42,20 +42,26 @@ async function findPlayer(key) {
   let conn;
   let returnValue = undefined;
   try {
+    console.log(`Finding player ${key}`);
     conn = await pool.getConnection();
     const rows = await conn.query(
       `SELECT \`value\` FROM \`SUN_Members\` WHERE \`key\` = ${pool.escape(
         key
       )}`
     );
-    if (rows && rows[0]) {
+
+    // console.log(rows[0]);
+    // console.log(rows.length);
+    if (rows && rows.length >= 1) {
       returnValue = rows[0].value;
     }
   } catch (err) {
+    console.log(err);
     throw err;
   } finally {
     if (conn) conn.end();
   }
+  console.log(`FIND PLAYER RETURNS:\n${returnValue}`);
   return returnValue;
 }
 
@@ -86,6 +92,7 @@ async function savePlayer(key, value) {
       );
     }
   } catch (err) {
+    console.log(err);
     throw err;
   } finally {
     if (conn) conn.end();
@@ -119,7 +126,10 @@ async function editPlayer(key, value) {
         )} WHERE \`key\` = ${pool.escape(key)}`
       );
     }
+
+    console.log(`Editing player ${key}`);
   } catch (err) {
+    console.log(err);
     throw err;
   } finally {
     if (conn) conn.end();
@@ -146,6 +156,7 @@ async function findPlayerFromInGameName(value) {
       returnValue = rows[0].key;
     }
   } catch (err) {
+    console.log(err);
     throw err;
   } finally {
     if (conn) conn.end();
@@ -161,6 +172,7 @@ async function removePlayer(key) {
   let conn;
   try {
     conn = await pool.getConnection();
+    console.log(`Removing player "${key}"`);
     await conn.query(
       `DELETE FROM \`SUN_Members\` WHERE \`key\` = ${pool.escape(key)}`
     );

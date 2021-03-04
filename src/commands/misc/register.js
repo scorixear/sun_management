@@ -1,11 +1,11 @@
 import Discord from 'discord.js';
 
-import Command from './command';
-import messageHandler from '../lib/messageHandler';
-import { dic as language, replaceArgs } from '../lib/languageHandler';
-import config from '../config';
-import sqlHandler from '../lib/sqlHandler';
-import discordHandler from '../lib/discordHandler';
+import Command from '../command';
+import messageHandler from '../../lib/messageHandler';
+import { dic as language, replaceArgs } from '../../lib/languageHandler';
+import config from '../../config';
+import sqlHandler from '../../lib/sqlHandler';
+import discordHandler from '../../lib/discordHandler';
 
 export default class Register extends Command {
   constructor(category) {
@@ -26,7 +26,9 @@ export default class Register extends Command {
     // checks permissions
     try {
       super.executeCommand(args, msg, params);
+      console.log(`Executing command`);
     } catch (err) {
+      console.error(err);
       return;
     }
 
@@ -35,8 +37,12 @@ export default class Register extends Command {
       // retrieve user object from mention
       let user = this.getUserFromMention(args[0]);
       if (!user) {
+        console.log('No user found, returning');
         return;
       }
+
+      console.log(`Retrieved user from mention`);
+
       // removes in-game entry
       await sqlHandler.removePlayer(user.id);
       messageHandler.sendRichTextDefault({
@@ -61,27 +67,39 @@ export default class Register extends Command {
 
     // if args are less then two this execution ends here
     if (args.length < 2) {
+      console.log('Args.length < 2');
       return;
     }
 
     // if channel name is not the register channel
-    if (msg.channel.id != config.registerChannel) {
-      /* There is no such thing as `msg.channel.name`
-       I suggest using IDs as those are available, and don't change on channel name changes.
+    // @ts-ignore
+    if (msg.channel.name != config.registerChannel) {
+      /* There is no such thing as `msg.channel.name` (in the types... this is discords mistake)
+       I suggest using IDs as those are available, and don't change on channel name changes. < This is still true, though.
        */
+      console.error(
+        // @ts-ignore
+        `Wrong channel, my friend. I need ${config.registerChannel} but you gave me ${msg.channel.name}`
+      );
+
       return;
     }
 
     // retrieve User object from mention
     let returnValue = true;
     let user = this.getUserFromMention(args[0]);
+
     if (!user) {
+      console.log(`Could not find a matching user, returning`);
       return;
     }
+
     // if given role is not the ignore role
     if (args[1] !== config.ignoreRole) {
       // check if there is already a player registered with this in-game name
       const previousOwner = await sqlHandler.findPlayerFromInGameName(args[1]);
+
+      console.log(`No ignore role`);
       // if yes remove the previous entry
       if (previousOwner) {
         await sqlHandler.removePlayer(previousOwner);
@@ -89,13 +107,16 @@ export default class Register extends Command {
     }
 
     // if player is not already entered
-    if (!sqlHandler.findPlayer(user.id)) {
+    if (await sqlHandler.findPlayer(user.id)) {
+      console.log(`Saving player ${user.id} as in-game ${args[1]}`);
       // save entry
       returnValue = await sqlHandler.savePlayer(user.id, args[1]);
     } else {
+      console.log(`Editing player`);
       // edit entry
       returnValue = await sqlHandler.editPlayer(user.id, args[1]);
     }
+
     // if save was successful
     if (returnValue) {
       messageHandler.sendRichTextDefault({
@@ -122,7 +143,11 @@ export default class Register extends Command {
    * @param {String} mention
    */
   getUserFromMention(mention) {
-    if (!mention) return;
+    if (!mention) {
+      console.log('No mention, returning');
+    }
+
+    console.log(`this is mention ${mention}`);
 
     if (mention.startsWith('<@') && mention.endsWith('>')) {
       mention = mention.slice(2, -1);
