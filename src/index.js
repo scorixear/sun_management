@@ -1,9 +1,9 @@
 // Package imports
-import DiscordHandler from './misc/discordHandler.js';
-import config from './config.js';
-import albionApiHandler from './misc/albionApiHandler';
-import CmdHandler from './misc/commandHandler.js';
-import SqlHandler from './misc/sqlHandler.js';
+import DiscordHandler from './lib/discordHandler';
+import config from './config';
+import albionApiHandler from './lib/albionApiHandler';
+import CmdHandler from './lib/commandHandler';
+import SqlHandler from './lib/sqlHandler';
 
 // Event when the bot goes online
 DiscordHandler.client.on('ready', () => {
@@ -12,17 +12,20 @@ DiscordHandler.client.on('ready', () => {
   // set the BOT activity
   DiscordHandler.client.user.setActivity('🦆Quack');
   // start the interval in which the roles of members will be registered.
-  setInterval(()=> {
-    albionApiHandler.clearAlbionMembers();
-  }, 24*60*60*1000);
-})
+  setInterval(() => {
+    albionApiHandler.removeMemberRoles();
+  }, 24 * 60 * 60 * 1000);
+});
 
 // Event when a message was received over any channel
 // call the string to the ParseCommand functions
-DiscordHandler.client.on('message', CmdHandler? CmdHandler.parseCommand: () => {});
+DiscordHandler.client.on(
+  'message',
+  CmdHandler ? CmdHandler.parseCommand : () => {}
+);
 
-// Initialize the Database if needed
-SqlHandler.initDB().then(()=>{
-  // after that login the client to the connected servers
+// Initialize the Database
+SqlHandler.initDB().then(() => {
+  // after that, log the client to the specified server(s)
   DiscordHandler.client.login(config.token);
 });

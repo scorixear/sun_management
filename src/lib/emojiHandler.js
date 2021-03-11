@@ -1,11 +1,22 @@
+import { Guild, GuildEmoji, Message } from 'discord.js';
+
 import discordHandler from './discordHandler';
 import messageHandler from './messageHandler';
-import {dic as language} from './languageHandler.js';
-// eslint-disable-next-line no-unused-vars
-import {Guild, GuildEmoji, Message} from 'discord.js';
+import { dic as language } from './languageHandler';
 
 const numbers = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣'];
-const numberString = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
+const numberString = [
+  'zero',
+  'one',
+  'two',
+  'three',
+  'four',
+  'five',
+  'six',
+  'seven',
+  'eight',
+  'nine'
+];
 
 /**
  * Finds a custom emoji of the given guild
@@ -38,7 +49,7 @@ function getCustomClientEmoji(name) {
 
 /**
  * Transforms given numbers to emoji numbers
- * @param {number} number the number to transfrom
+ * @param {number} number the number to transform
  * @return {string} the emoji
  */
 function getGlobalDiscordEmoji(number) {
@@ -55,7 +66,7 @@ function getNumberFromEmoji(emoji) {
 }
 
 /**
- * This callback is displayed as part of the resolveWithReaction funciton
+ * This callback is displayed as part of the resolveWithReaction function
  * @callback resolveCallback
  * @param {string} option the chosen option
  * @param {Message} msg the given Message Object
@@ -71,12 +82,19 @@ function getNumberFromEmoji(emoji) {
  * @param {resolveCallback} method function to execute
  * @param {*} additionalArguments additional arguments, that will be passed through to the method
  */
-function resolveWithReaction(msg, messageString, options, join, method, additionalArguments) {
+function resolveWithReaction(
+  msg,
+  messageString,
+  options,
+  join,
+  method,
+  additionalArguments
+) {
   const reactEmojis = [];
   let commandList;
   if (options && options.length > 0) {
-    commandList = language.handlers.emoji.labels.did_you_mean;
-    for (let i = 0; i<options.length; i++) {
+    commandList = language.lang.handlers.emoji.labels.did_you_mean;
+    for (let i = 0; i < options.length; i++) {
       const emoji = getGlobalDiscordEmoji(i);
       commandList += `\n${emoji} \`${options[i]}`;
       reactEmojis.push(emoji);
@@ -87,31 +105,53 @@ function resolveWithReaction(msg, messageString, options, join, method, addition
     }
   }
 
-  const categories = [{
-    title: language.general.message,
-    text: messageString,
-  }];
+  const categories = [
+    {
+      title: language.lang.general.message,
+      text: messageString
+    }
+  ];
   if (commandList) {
     categories.push({
-      title: language.handlers.emoji.labels.synonyms,
-      text: commandList,
+      title: language.lang.handlers.emoji.labels.synonyms,
+      text: commandList
     });
     categories.push({
-      title: language.general.usage,
-      text: language.handlers.emoji.labels.usage,
+      title: language.lang.general.usage,
+      text: language.lang.handlers.emoji.labels.usage
     });
   }
 
-  messageHandler.sendRichText(msg, language.general.error, categories).then((m) => {
-    reactEmojis.forEach((e)=>m.react(e));
-    return m;
-  }).then((m) => {
-    m.awaitReactions((react, user) => reactEmojis.includes(react.emoji.name) && user.id === msg.author.id,
-        {max: 1, time: 60000, errors: ['time']}).then((collected) => {
-      const reaction = collected.first();
-      method(options[getNumberFromEmoji(reaction.emoji.name)], msg, additionalArguments);
+  messageHandler
+    .sendRichText({
+      msg,
+      title: language.lang.general.error,
+      description: undefined,
+      categories,
+      color: undefined,
+      image: undefined,
+      thumbnail: undefined,
+      url: undefined,
+      footer: undefined
+    })
+    .then((m) => {
+      reactEmojis.forEach((e) => m.react(e));
+      return m;
+    })
+    .then((m) => {
+      m.awaitReactions(
+        (react, user) =>
+          reactEmojis.includes(react.emoji.name) && user.id === msg.author.id,
+        { max: 1, time: 60000, errors: ['time'] }
+      ).then((collected) => {
+        const reaction = collected.first();
+        method(
+          options[getNumberFromEmoji(reaction.emoji.name)],
+          msg,
+          additionalArguments
+        );
+      });
     });
-  });
 }
 
 export default {
@@ -119,5 +159,5 @@ export default {
   getCustomGuildEmoji,
   getGlobalDiscordEmoji,
   getNumberFromEmoji,
-  resolveWithReaction,
+  resolveWithReaction
 };

@@ -1,19 +1,23 @@
-import Command from '../command.js';
-import messageHandler from '../../misc/messageHandler.js';
-import {dic as language, replaceArgs} from '../../misc/languageHandler.js';
-import config from '../../config.js';
-import sqlHandler from '../../misc/sqlHandler.js';
-import {GuildEmoji, Message} from 'discord.js';
-import albionApiHandler from '../../misc/albionApiHandler.js';
+import { Message } from 'discord.js';
+
+import Command from '../command';
+import messageHandler from '../../lib/messageHandler';
+import { dic as language } from '../../lib/languageHandler';
+// import config from '../config.js'
+// import sqlHandler from '../lib/sqlHandler.js'
+import albionApiHandler from '../../lib/albionApiHandler';
 
 export default class RemoveMembers extends Command {
   constructor(category) {
     super(category);
-    this.usage = `removeMembers`;
+
+    const desc = `${language.lang.commands.removeMembers.description}`;
+
     this.command = 'removeMembers';
-    this.description = () => language.commands.removeMembers.description;
+    this.description = () => desc;
     this.example = 'removeMembers';
-    this.permissions = ["MANAGE_ROLES"]
+    this.permissions = ['MANAGE_ROLES'];
+    this.usage = `removeMembers`;
   }
   /**
    * Executes the command
@@ -31,11 +35,17 @@ export default class RemoveMembers extends Command {
     // starts removing players
     messageHandler.sendRichTextDefault({
       msg: msg,
-      title: language.commands.removeMembers.labels.titleRemoving,
-      description: language.commands.removeMembers.labels.descriptionRemoving,
+      title: language.lang.commands.removeMembers.labels.titleRemoving,
+      description:
+        language.lang.commands.removeMembers.labels.descriptionRemoving,
+      categories: undefined,
+      thumbnail: undefined,
+      footer: undefined,
+      color: undefined,
+      url: undefined,
+      image: undefined
     });
-    const removedPlayers = await albionApiHandler.clearAlbionMembers();
-    
 
+    await albionApiHandler.removeMemberRoles();
   }
 }
